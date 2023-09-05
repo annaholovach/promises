@@ -44,13 +44,35 @@ promiseAll(promises)
 //2
 
 function promiseAllSettled (arrayOfPromises) {
-    return Promise.all(
-        arrayOfPromises.map(promise =>
+    const result = []
+    let count = 0
+
+    return new Promise(resolve => {
+        if (arrayOfPromises.length === 0) {
+            resolve(result)
+            return
+        }
+
+        arrayOfPromises.forEach((promise, index) => {
             promise
-                .then(value => ({status: 'fulfilled', value}))
-                .catch(err => ({status: 'rejected', err}))
-        )
-    )
+                .then(value => {
+                    result[index] = {status: 'fulfilled', value}
+                    count++
+
+                    if (count === arrayOfPromises.length) {
+                        resolve(result)
+                    }
+                })
+                .catch(err => {
+                    result[index] = {status: 'rejected', err}
+                    count++
+
+                    if (count === arrayOfPromises.length) {
+                        resolve(result)
+                    }
+                })
+        })   
+    })
 }
 
 const promises2 = [
